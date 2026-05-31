@@ -1,7 +1,4 @@
-﻿namespace DefaultNamespace
+﻿public class GameManager
 {
-    public class GameManager
-    {
         
-    }
 }
