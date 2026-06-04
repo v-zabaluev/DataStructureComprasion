@@ -23,9 +23,7 @@ namespace Benchmark.UI
         [SerializeField] private TMP_Text _statusText;
 
         [Header("Benchmark")]
-
         [SerializeField] private TMP_Dropdown _structureDropdown;
-
         [SerializeField] private TMP_Dropdown _scenarioDropdown;
 
         [Header("Load")]
@@ -56,7 +54,6 @@ namespace Benchmark.UI
         [Header("World")]
 
         [SerializeField] private TMP_InputField _spawnMinXInput;
-
         [SerializeField] private TMP_InputField _spawnMinYInput;
         [SerializeField] private TMP_InputField _spawnMaxXInput;
         [SerializeField] private TMP_InputField _spawnMaxYInput;
@@ -64,21 +61,13 @@ namespace Benchmark.UI
         [Header("Effect Area")]
 
         [SerializeField] private TMP_InputField _effectCenterXInput;
-
         [SerializeField] private TMP_InputField _effectCenterYInput;
         [SerializeField] private TMP_InputField _effectRadiusInput;
 
-        [Header("Grid")]
-
-        [SerializeField] private TMP_InputField _cellsPerRowInput;
-
-        [SerializeField] private Toggle _autoCalculateCellSizeToggle;
-        [SerializeField] private TMP_InputField _cellSizeInput;
 
         [Header("Wave")]
 
         [SerializeField] private TMP_InputField _waveCountInput;
-
         [SerializeField] private TMP_InputField _projectilesPerWaveInput;
 
         [Header("Factory")]
@@ -201,9 +190,6 @@ namespace Benchmark.UI
 
             config.EffectRadius = ReadFloat(_effectRadiusInput, 15f);
 
-            config.CellsPerRow = ReadInt(_cellsPerRowInput, 10);
-            config.AutoCalculateCellSize = ReadBool(_autoCalculateCellSizeToggle, true);
-            config.CellSize = ReadFloat(_cellSizeInput, 10f);
 
             config.WaveCount = ReadInt(_waveCountInput, 5);
             config.ProjectilesPerWave = ReadInt(_projectilesPerWaveInput, 1000);
@@ -346,7 +332,7 @@ namespace Benchmark.UI
                 "CSV сохранён:\n" +
                 filePath;
         }
-
+        
         private void FillStructureDropdown()
         {
             _structureDropdown.ClearOptions();
@@ -361,7 +347,7 @@ namespace Benchmark.UI
 
             _structureDropdown.AddOptions(options);
         }
-
+        
         private void FillScenarioDropdown()
         {
             _scenarioDropdown.ClearOptions();
@@ -376,13 +362,13 @@ namespace Benchmark.UI
 
             _scenarioDropdown.AddOptions(options);
         }
-
+        
         private BenchmarkStructureKind GetSelectedStructure()
         {
             return (BenchmarkStructureKind)
                 _structureDropdown.value;
         }
-
+        
         private BenchmarkScenario GetSelectedScenario()
         {
             return (BenchmarkScenario)

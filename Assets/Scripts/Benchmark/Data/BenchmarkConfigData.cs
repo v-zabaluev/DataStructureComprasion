@@ -50,14 +50,6 @@ namespace Benchmark.Data
 
         public float EffectRadius = 15f;
 
-        [Header("Grid")]
-
-        [Min(1)] public int CellsPerRow = 10;
-
-        public bool AutoCalculateCellSize = true;
-
-        [Min(0.01f)] public float CellSize = 10f;
-
         [Header("Wave")]
 
         [Min(1)] public int WaveCount = 5;
@@ -84,9 +76,6 @@ namespace Benchmark.Data
                 SpawnMax = SpawnMax,
                 EffectCenter = EffectCenter,
                 EffectRadius = EffectRadius,
-                CellsPerRow = CellsPerRow,
-                AutoCalculateCellSize = AutoCalculateCellSize,
-                CellSize = CellSize,
                 WaveCount = WaveCount,
                 ProjectilesPerWave = ProjectilesPerWave
             };
@@ -98,9 +87,34 @@ namespace Benchmark.Data
 
         public void Normalize()
         {
-            if (CellsPerRow < 1)
+            if (ObjectCount < 1)
             {
-                CellsPerRow = 1;
+                ObjectCount = 1;
+            }
+
+            if (OperationCount < 1)
+            {
+                OperationCount = 1;
+            }
+
+            if (WarmupRuns < 1)
+            {
+                WarmupRuns = 1;
+            }
+
+            if (MeasuredRuns < 1)
+            {
+                MeasuredRuns = 1;
+            }
+
+            if (WaveCount < 1)
+            {
+                WaveCount = 1;
+            }
+
+            if (ProjectilesPerWave < 1)
+            {
+                ProjectilesPerWave = 1;
             }
 
             if (SpawnMax.x < SpawnMin.x)
@@ -117,29 +131,10 @@ namespace Benchmark.Data
                 SpawnMax.y = temp;
             }
 
-            if (AutoCalculateCellSize)
+            if (EffectRadius < 0f)
             {
-                CellSize = CalculateAutoCellSize();
+                EffectRadius = 0f;
             }
-
-            if (CellSize < 0.01f)
-            {
-                CellSize = 0.01f;
-            }
-        }
-
-        public float CalculateAutoCellSize()
-        {
-            float width = SpawnMax.x - SpawnMin.x;
-            float height = SpawnMax.y - SpawnMin.y;
-            float worldSize = Mathf.Max(width, height);
-
-            if (worldSize <= 0f)
-            {
-                return 0.01f;
-            }
-
-            return worldSize / CellsPerRow;
         }
     }
 }

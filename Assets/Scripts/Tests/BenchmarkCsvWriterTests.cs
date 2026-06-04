@@ -25,7 +25,7 @@ namespace Benchmark.Tests
             BenchmarkConfigData config = new BenchmarkConfigData
             {
                 StructureKind = BenchmarkStructureKind.List,
-                Scenario = BenchmarkScenario.GroupBySector,
+                Scenario = BenchmarkScenario.EffectArea,
                 ObjectCount = 1234,
                 OperationCount = 5678,
                 WarmupRuns = 2,
@@ -40,16 +40,13 @@ namespace Benchmark.Tests
                 SpawnMax = new Vector2(110f, 220f),
                 EffectCenter = new Vector2(5f, 6f),
                 EffectRadius = 17f,
-                CellsPerRow = 11,
-                AutoCalculateCellSize = false,
-                CellSize = 12.5f,
                 WaveCount = 6,
                 ProjectilesPerWave = 700
             };
 
             BenchmarkResult result = new BenchmarkResult(
                 "List",
-                "GroupBySector",
+                "EffectArea",
                 config.ObjectCount,
                 config.OperationCount,
                 1.0,
@@ -77,10 +74,15 @@ namespace Benchmark.Tests
             Assert.That(csv, Does.Contain("DeltaTime"));
             Assert.That(csv, Does.Contain("ProjectileSpeed"));
             Assert.That(csv, Does.Contain("ProjectileLifeTime"));
-            Assert.That(csv, Does.Contain("ObjectsPerCell"));
+            Assert.That(csv, Does.Contain("EffectRadius"));
+            Assert.That(csv, Does.Contain("WaveCount"));
+            Assert.That(csv, Does.Contain("ProjectilesPerWave"));
+            Assert.That(csv, Does.Not.Contain("CellsPerRow"));
+            Assert.That(csv, Does.Not.Contain("CellSize"));
+            Assert.That(csv, Does.Not.Contain("ObjectsPerCell"));
             Assert.That(csv, Does.Contain(";2;4;False;False;42;0.0200;7.5000;3.2500;"));
             Assert.That(csv, Does.Contain(";-10.0000;-20.0000;110.0000;220.0000;"));
-            Assert.That(csv, Does.Contain(";11;False;12.5000;10.1983;6;700;"));
+            Assert.That(csv, Does.Contain(";5.0000;6.0000;17.0000;6;700;"));
         }
 
         [Test]
@@ -90,10 +92,8 @@ namespace Benchmark.Tests
             {
                 ObjectCount = 100,
                 OperationCount = 200,
-                CellsPerRow = 10,
-                AutoCalculateCellSize = false,
-                CellSize = 5f,
-                BaseSeed = 1
+                BaseSeed = 1,
+                ProjectileSpeed = 5f
             };
 
             BenchmarkResult result = new BenchmarkResult(
@@ -114,10 +114,10 @@ namespace Benchmark.Tests
                 config);
 
             config.BaseSeed = 999;
-            config.CellSize = 100f;
+            config.ProjectileSpeed = 100f;
 
             Assert.AreEqual(1, result.Config.BaseSeed);
-            Assert.AreEqual(5f, result.Config.CellSize);
+            Assert.AreEqual(5f, result.Config.ProjectileSpeed);
         }
     }
 }

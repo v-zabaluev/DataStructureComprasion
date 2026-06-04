@@ -31,12 +31,8 @@ namespace Benchmark.Core
         public readonly float EffectCenterX;
         public readonly float EffectCenterY;
         public readonly float EffectRadius;
-        public readonly int CellsPerRow;
-        public readonly bool AutoCalculateCellSize;
-        public readonly float CellSize;
         public readonly int WaveCount;
         public readonly int ProjectilesPerWave;
-        public readonly float ObjectsPerCell;
 
         public BenchmarkResult(
             string structure,
@@ -82,14 +78,8 @@ namespace Benchmark.Core
             EffectCenterX = Config.EffectCenter.x;
             EffectCenterY = Config.EffectCenter.y;
             EffectRadius = Config.EffectRadius;
-            CellsPerRow = Config.CellsPerRow;
-            AutoCalculateCellSize = Config.AutoCalculateCellSize;
-            CellSize = Config.CellSize;
             WaveCount = Config.WaveCount;
             ProjectilesPerWave = Config.ProjectilesPerWave;
-
-            int cellCount = CellsPerRow * CellsPerRow;
-            ObjectsPerCell = cellCount <= 0 ? 0f : (float)Objects / cellCount;
         }
     }
 }

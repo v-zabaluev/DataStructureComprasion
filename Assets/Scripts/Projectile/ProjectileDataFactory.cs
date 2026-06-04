@@ -2,7 +2,7 @@
 
 namespace Projectile
 {
-    public  class ProjectileDataFactory
+    public class ProjectileDataFactory
     {
         public ProjectileData Create(ProjectileCreationData creationData)
         {
@@ -11,8 +11,7 @@ namespace Projectile
                 creationData.Position,
                 creationData.Direction,
                 creationData.Speed,
-                creationData.LifeTime,
-                creationData.SectorId);
+                creationData.LifeTime);
         }
     }
 }

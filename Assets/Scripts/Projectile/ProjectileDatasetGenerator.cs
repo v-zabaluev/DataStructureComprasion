@@ -49,19 +49,12 @@ namespace Projectile
             Vector2 position = CreatePosition(random, config);
             Vector2 direction = CreateDirection(random);
 
-            int sectorId = ProjectileData.CalculateSector(
-                position,
-                config.SpawnMin,
-                config.CellSize,
-                config.CellsPerRow);
-
             return new ProjectileCreationData(
                 id,
                 position,
                 direction,
                 config.ProjectileSpeed,
-                config.ProjectileLifeTime,
-                sectorId);
+                config.ProjectileLifeTime);
         }
 
         private Vector2 CreatePosition(Random random, BenchmarkConfigData config)
@@ -93,8 +86,7 @@ namespace Projectile
         private float NextFloat(Random random, float minInclusive, float maxInclusive)
         {
             double value = random.NextDouble();
-
-            return minInclusive + (maxInclusive - minInclusive) * (float) value;
+            return minInclusive + (float) value * (maxInclusive - minInclusive);
         }
     }
 }

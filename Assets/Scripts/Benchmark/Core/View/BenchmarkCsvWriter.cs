@@ -60,16 +60,11 @@ namespace Benchmark.IO
                 "SpawnMax: (" + Format(config.SpawnMax.x) + "; " + Format(config.SpawnMax.y) + ")\n" +
                 "EffectCenter: (" + Format(config.EffectCenter.x) + "; " + Format(config.EffectCenter.y) + ")\n" +
                 "EffectRadius: " + Format(config.EffectRadius) + "\n" +
-                "CellsPerRow: " + config.CellsPerRow + "\n" +
-                "AutoCalculateCellSize: " + config.AutoCalculateCellSize + "\n" +
-                "CellSize: " + Format(config.CellSize) + "\n" +
-                "ObjectsPerCell: " + Format(result.ObjectsPerCell) + "\n" +
                 "WaveCount: " + config.WaveCount + "\n" +
                 "ProjectilesPerWave: " + config.ProjectilesPerWave + "\n" +
                 "AverageScenarioExecutionTimeMs: " + Format(result.AverageScenarioExecutionTimeMs) + "\n" +
                 "MedianScenarioExecutionTimeMs: " + Format(result.MedianScenarioExecutionTimeMs) + "\n" +
-                "StandardDeviationScenarioExecutionTimeMs: " + Format(result.StandardDeviationScenarioExecutionTimeMs) +
-                "\n" +
+                "StandardDeviationScenarioExecutionTimeMs: " + Format(result.StandardDeviationScenarioExecutionTimeMs) + "\n" +
                 "MinScenarioExecutionTimeMs: " + Format(result.MinScenarioExecutionTimeMs) + "\n" +
                 "MaxScenarioExecutionTimeMs: " + Format(result.MaxScenarioExecutionTimeMs) + "\n" +
                 "AllocatedBytes: " + result.AllocatedBytes + "\n" +
@@ -114,10 +109,6 @@ namespace Benchmark.IO
                 "EffectCenterX;" +
                 "EffectCenterY;" +
                 "EffectRadius;" +
-                "CellsPerRow;" +
-                "AutoCalculateCellSize;" +
-                "CellSize;" +
-                "ObjectsPerCell;" +
                 "WaveCount;" +
                 "ProjectilesPerWave;" +
                 "AverageScenarioExecutionTimeMs;" +
@@ -156,10 +147,6 @@ namespace Benchmark.IO
                 Format(config.EffectCenter.x) + ";" +
                 Format(config.EffectCenter.y) + ";" +
                 Format(config.EffectRadius) + ";" +
-                config.CellsPerRow + ";" +
-                config.AutoCalculateCellSize + ";" +
-                Format(config.CellSize) + ";" +
-                Format(result.ObjectsPerCell) + ";" +
                 config.WaveCount + ";" +
                 config.ProjectilesPerWave + ";" +
                 Format(result.AverageScenarioExecutionTimeMs) + ";" +

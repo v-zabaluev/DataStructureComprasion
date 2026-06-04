@@ -12,9 +12,8 @@
         ClearCollection = 7,
         MassFill = 8,
         EffectArea = 9,
-        GroupBySector = 10,
-        EcsMassUpdateWithJobsBurst = 11,
-        ParallelWriteResults = 12,
-        FullWaveCycle = 13
+        EcsMassUpdateWithJobsBurst = 10,
+        ParallelWriteResults = 11,
+        FullWaveCycle = 12
     }
 }
