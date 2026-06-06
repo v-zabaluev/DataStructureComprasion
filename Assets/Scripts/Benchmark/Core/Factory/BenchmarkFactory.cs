@@ -1,4 +1,5 @@
 ﻿using System;
+using Benchmark.Benchmarks;
 using Benchmark.Core.Enums;
 using Benchmark.Core.Interfaces;
 using Benchmark.DataStructures;
@@ -14,7 +15,8 @@ namespace Benchmark.UI
             {
                 case BenchmarkStructureKind.Dummy:
                     return new DummyBenchmark();
-
+                case BenchmarkStructureKind.Array:
+                    return new ArrayProjectileStorageBenchmark();
                     break;
                 default:
                     throw new NotSupportedException(

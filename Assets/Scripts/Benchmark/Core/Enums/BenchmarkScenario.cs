@@ -13,7 +13,6 @@
         MassFill = 8,
         EffectArea = 9,
         EcsMassUpdateWithJobsBurst = 10,
-        ParallelWriteResults = 11,
-        FullWaveCycle = 12
+        FullWaveCycle = 11
     }
 }
