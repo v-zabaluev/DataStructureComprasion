@@ -21,6 +21,18 @@ namespace Benchmark.UI
                     return new ListProjectileStorageBenchmark();
                 case BenchmarkStructureKind.Dictionary:
                     return new DictionaryProjectileStorageBenchmark();
+                case BenchmarkStructureKind.HashSet:
+                    return new HashSetProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeArray:
+                    return new NativeArrayProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeList:
+                    return new NativeListProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeHashSet:
+                    return new NativeHashSetProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeHashMap:
+                    return new NativeHashMapProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeParallelHashMap:
+                    return new NativeParallelHashMapProjectileStorageBenchmark();
                 default:
                     throw new NotSupportedException(
                         "Benchmark structure is not supported: " + kind);

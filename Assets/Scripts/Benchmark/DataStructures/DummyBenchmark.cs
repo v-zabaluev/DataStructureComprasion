@@ -1,4 +1,5 @@
-﻿using Benchmark.Core.Enums;
+﻿using System.Diagnostics;
+using Benchmark.Core.Enums;
 using Benchmark.Core.Interfaces;
 using Benchmark.Data;
 using Projectile.Data;
@@ -20,7 +21,7 @@ namespace Benchmark.DataStructures
         {
         }
 
-        public int RunScenario(BenchmarkConfigData config)
+        public int RunScenario(BenchmarkConfigData config, Stopwatch stopwatch)
         {
             return 123;
         }

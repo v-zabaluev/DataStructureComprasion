@@ -12,9 +12,6 @@
         NativeHashSet = 6,
         NativeHashMap = 7,
         NativeParallelHashMap = 8,
-        NativeParallelMultiHashMap = 9,
-
-        DynamicBuffer = 10,
-        Dummy = 11,
+        Dummy = 9,
     }
 }

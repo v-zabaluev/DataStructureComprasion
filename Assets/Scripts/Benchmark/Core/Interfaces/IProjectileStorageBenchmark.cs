@@ -1,4 +1,5 @@
-﻿using Benchmark.Core.Enums;
+﻿using System.Diagnostics;
+using Benchmark.Core.Enums;
 using Benchmark.Data;
 using Projectile.Data;
 
@@ -12,7 +13,7 @@ namespace Benchmark.Core.Interfaces
 
         void Prepare(BenchmarkConfigData config,  ProjectileDataset dataset);
 
-        int RunScenario(BenchmarkConfigData config);
+        int RunScenario(BenchmarkConfigData config, Stopwatch stopwatch);
 
         void Cleanup();
     }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Benchmark.Core.Enums;
 using Benchmark.Core.Interfaces;
 using Benchmark.Data;
@@ -16,7 +17,8 @@ namespace Benchmark.Benchmarks
 
         public bool IsScenarioSupported(BenchmarkScenario scenario)
         {
-            return scenario != BenchmarkScenario.EcsMassUpdateWithJobsBurst;
+            return scenario != BenchmarkScenario.JobsBurstMassUpdate &&
+                   scenario != BenchmarkScenario.ParallelWriteResults;
         }
 
         public void Prepare(BenchmarkConfigData config, ProjectileDataset dataset)
@@ -27,13 +29,13 @@ namespace Benchmark.Benchmarks
             _items = new ProjectileData[length];
             _count = length;
 
-            if (dataset != null && length > 0)
+            for (int i = 0; i < length; i++)
             {
-                dataset.CopyTo(_items);
+                _items[i] = GetDatasetItem(i);
             }
         }
 
-        public int RunScenario(BenchmarkConfigData config)
+        public int RunScenario(BenchmarkConfigData config, Stopwatch stopwatch)
         {
             switch (config.Scenario)
             {
@@ -117,6 +119,7 @@ namespace Benchmark.Benchmarks
 
                 _items = target;
                 _count = count;
+
                 return checksum + _count;
             }
 
@@ -192,6 +195,7 @@ namespace Benchmark.Benchmarks
                     if (_items[j].Id == targetId)
                     {
                         foundIndex = j;
+
                         break;
                     }
                 }
@@ -217,6 +221,7 @@ namespace Benchmark.Benchmarks
                     if (_items[j].Id == targetId)
                     {
                         contains = true;
+
                         break;
                     }
                 }
@@ -383,7 +388,10 @@ namespace Benchmark.Benchmarks
                 return default;
             }
 
-            return _dataset.Get(index % _dataset.Count);
+            ProjectileData item = _dataset.Get(index % _dataset.Count);
+            item.Id = index;
+
+            return item;
         }
 
         private int GetTargetId(int operationIndex)
@@ -393,7 +401,7 @@ namespace Benchmark.Benchmarks
                 return -1;
             }
 
-            return _dataset.Get(operationIndex % _dataset.Count).Id;
+            return operationIndex % _dataset.Count;
         }
 
         private int GetSafeOperationCount(BenchmarkConfigData config)

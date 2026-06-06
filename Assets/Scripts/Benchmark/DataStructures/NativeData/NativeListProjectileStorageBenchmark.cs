@@ -1,40 +1,39 @@
-﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Benchmark.Core.Enums;
 using Benchmark.Core.Interfaces;
 using Benchmark.Data;
 using Projectile.Data;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace Benchmark.Benchmarks
 {
-    public class ListProjectileStorageBenchmark : IProjectileStorageBenchmark
+    public class NativeListProjectileStorageBenchmark : IProjectileStorageBenchmark
     {
-        private List<ProjectileData> _items;
+        private NativeList<ProjectileData> _items;
         private ProjectileDataset _dataset;
+        private bool _isCreated;
 
-        public string StructureName => "List";
+        public string StructureName => "NativeList";
 
         public bool IsScenarioSupported(BenchmarkScenario scenario)
         {
-            return scenario != BenchmarkScenario.JobsBurstMassUpdate &&
-                   scenario != BenchmarkScenario.ParallelWriteResults;
+            return scenario != BenchmarkScenario.ParallelWriteResults;
         }
 
         public void Prepare(BenchmarkConfigData config, ProjectileDataset dataset)
         {
+            Cleanup();
+
             _dataset = dataset;
 
             int length = dataset == null ? 0 : dataset.Count;
+            int capacity = config.PreallocateCapacity ? Mathf.Max(1, length) : 1;
 
-            if (config.PreallocateCapacity)
-            {
-                _items = new List<ProjectileData>(length);
-            }
-            else
-            {
-                _items = new List<ProjectileData>();
-            }
+            _items = new NativeList<ProjectileData>(capacity, Allocator.Persistent);
+            _isCreated = true;
 
             for (int i = 0; i < length; i++)
             {
@@ -76,6 +75,9 @@ namespace Benchmark.Benchmarks
                 case BenchmarkScenario.EffectArea:
                     return RunEffectArea(config);
 
+                case BenchmarkScenario.JobsBurstMassUpdate:
+                    return RunJobsBurstMassUpdate(config, stopwatch);
+
                 case BenchmarkScenario.FullWaveCycle:
                     return RunFullWaveCycle(config);
 
@@ -86,15 +88,20 @@ namespace Benchmark.Benchmarks
 
         public void Cleanup()
         {
-            _items = null;
+            if (_isCreated && _items.IsCreated)
+            {
+                _items.Dispose();
+            }
+
             _dataset = null;
+            _isCreated = false;
         }
 
         private int RunSequentialIteration()
         {
             int checksum = 0;
 
-            for (int i = 0; i < _items.Count; i++)
+            for (int i = 0; i < _items.Length; i++)
             {
                 ProjectileData item = _items[i];
                 checksum += item.Id;
@@ -110,44 +117,36 @@ namespace Benchmark.Benchmarks
             int operationCount = GetSafeOperationCount(config);
             int checksum = 0;
 
-            List<ProjectileData> target;
+            DisposeCurrentList();
 
-            if (config.PreallocateCapacity)
-            {
-                target = new List<ProjectileData>(operationCount);
-            }
-            else
-            {
-                target = new List<ProjectileData>();
-            }
+            int capacity = config.PreallocateCapacity ? operationCount : 1;
+            _items = new NativeList<ProjectileData>(capacity, Allocator.Persistent);
+            _isCreated = true;
 
             for (int i = 0; i < operationCount; i++)
             {
                 ProjectileData item = GetDatasetItem(i);
-                target.Add(item);
+                _items.Add(item);
                 checksum += item.Id;
             }
 
-            _items = target;
-
-            return checksum + _items.Count;
+            return checksum + _items.Length;
         }
 
         private int RunRemoveElement(BenchmarkConfigData config)
         {
-            int operations = Mathf.Min(GetSafeOperationCount(config), _items.Count);
+            int operations = Mathf.Min(GetSafeOperationCount(config), _items.Length);
             int checksum = 0;
 
             for (int i = 0; i < operations; i++)
             {
-                if (_items.Count == 0)
+                if (_items.Length == 0)
                 {
                     break;
                 }
 
-                int index = (_items.Count - 1) / 2;
-                ProjectileData item = _items[index];
-                checksum += item.Id;
+                int index = (_items.Length - 1) / 2;
+                checksum += _items[index].Id;
 
                 if (config.PreserveOrderOnRemove)
                 {
@@ -155,12 +154,11 @@ namespace Benchmark.Benchmarks
                 }
                 else
                 {
-                    int lastIndex = _items.Count - 1;
-                    _items[index] = _items[lastIndex];
-                    _items.RemoveAt(lastIndex);
+                    _items.RemoveAtSwapBack(index);
                 }
             }
-            return checksum + _items.Count;
+
+            return checksum + _items.Length;
         }
 
         private int RunSearchById(BenchmarkConfigData config)
@@ -173,7 +171,7 @@ namespace Benchmark.Benchmarks
                 int targetId = GetTargetId(i);
                 int foundIndex = -1;
 
-                for (int j = 0; j < _items.Count; j++)
+                for (int j = 0; j < _items.Length; j++)
                 {
                     if (_items[j].Id == targetId)
                     {
@@ -198,7 +196,7 @@ namespace Benchmark.Benchmarks
                 int targetId = GetTargetId(i);
                 bool contains = false;
 
-                for (int j = 0; j < _items.Count; j++)
+                for (int j = 0; j < _items.Length; j++)
                 {
                     if (_items[j].Id == targetId)
                     {
@@ -220,7 +218,7 @@ namespace Benchmark.Benchmarks
         {
             int checksum = 0;
 
-            for (int i = 0; i < _items.Count; i++)
+            for (int i = 0; i < _items.Length; i++)
             {
                 ProjectileData item = _items[i];
                 item.Update(config.DeltaTime);
@@ -238,14 +236,14 @@ namespace Benchmark.Benchmarks
             int operations = GetSafeOperationCount(config);
             int checksum = 0;
 
-            if (_items.Count == 0)
+            if (_items.Length == 0)
             {
                 return checksum;
             }
 
             for (int i = 0; i < operations; i++)
             {
-                int index = i % _items.Count;
+                int index = i % _items.Length;
                 ProjectileData item = _items[index];
                 item.Update(config.DeltaTime);
                 _items[index] = item;
@@ -259,7 +257,7 @@ namespace Benchmark.Benchmarks
 
         private int RunClearCollection()
         {
-            int checksum = _items.Count;
+            int checksum = _items.Length;
             _items.Clear();
 
             return checksum;
@@ -270,27 +268,20 @@ namespace Benchmark.Benchmarks
             int operationCount = GetSafeOperationCount(config);
             int checksum = 0;
 
-            List<ProjectileData> target;
+            DisposeCurrentList();
 
-            if (config.PreallocateCapacity)
-            {
-                target = new List<ProjectileData>(operationCount);
-            }
-            else
-            {
-                target = new List<ProjectileData>();
-            }
+            int capacity = config.PreallocateCapacity ? operationCount : 1;
+            _items = new NativeList<ProjectileData>(capacity, Allocator.Persistent);
+            _isCreated = true;
 
             for (int i = 0; i < operationCount; i++)
             {
                 ProjectileData item = GetDatasetItem(i);
-                target.Add(item);
+                _items.Add(item);
                 checksum += item.Id;
             }
 
-            _items = target;
-
-            return checksum + _items.Count;
+            return checksum + _items.Length;
         }
 
         private int RunEffectArea(BenchmarkConfigData config)
@@ -298,7 +289,7 @@ namespace Benchmark.Benchmarks
             int checksum = 0;
             int insideCount = 0;
 
-            for (int i = 0; i < _items.Count; i++)
+            for (int i = 0; i < _items.Length; i++)
             {
                 ProjectileData item = _items[i];
 
@@ -312,21 +303,40 @@ namespace Benchmark.Benchmarks
             return checksum + insideCount;
         }
 
+        private int RunJobsBurstMassUpdate(BenchmarkConfigData config, Stopwatch stopwatch)
+        {
+            if (_items.Length == 0)
+            {
+                return 0;
+            }
+
+            NativeArray<ProjectileData> array = _items.AsArray();
+
+            UpdateProjectilesJob job = new UpdateProjectilesJob
+            {
+                DeltaTime = config.DeltaTime,
+                Items = array
+            };
+
+            JobHandle handle = job.Schedule(array.Length, 64);
+            handle.Complete();
+
+            if (stopwatch != null && stopwatch.IsRunning)
+            {
+                stopwatch.Stop();
+            }
+
+            return RunSequentialIteration();
+        }
+
         private int RunFullWaveCycle(BenchmarkConfigData config)
         {
             int checksum = 0;
             int maxActive = Mathf.Max(1, config.WaveCount * config.ProjectilesPerWave);
 
-            List<ProjectileData> active;
-
-            if (config.PreallocateCapacity)
-            {
-                active = new List<ProjectileData>(maxActive);
-            }
-            else
-            {
-                active = new List<ProjectileData>();
-            }
+            NativeList<ProjectileData> active = new NativeList<ProjectileData>(
+                config.PreallocateCapacity ? maxActive : 1,
+                Allocator.Persistent);
 
             for (int wave = 0; wave < config.WaveCount; wave++)
             {
@@ -337,18 +347,17 @@ namespace Benchmark.Benchmarks
                     checksum += item.Id;
                 }
 
-                for (int i = 0; i < active.Count; i++)
+                for (int i = 0; i < active.Length; i++)
                 {
                     ProjectileData item = active[i];
                     item.Update(config.DeltaTime);
                     active[i] = item;
-
                     checksum += Mathf.FloorToInt(item.Position.x + item.Position.y);
                 }
 
                 int index = 0;
 
-                while (index < active.Count)
+                while (index < active.Length)
                 {
                     if (active[index].IsExpired())
                     {
@@ -360,9 +369,7 @@ namespace Benchmark.Benchmarks
                         }
                         else
                         {
-                            int lastIndex = active.Count - 1;
-                            active[index] = active[lastIndex];
-                            active.RemoveAt(lastIndex);
+                            active.RemoveAtSwapBack(index);
                         }
                     }
                     else
@@ -372,9 +379,21 @@ namespace Benchmark.Benchmarks
                 }
             }
 
+            DisposeCurrentList();
             _items = active;
+            _isCreated = true;
 
-            return checksum + _items.Count;
+            return checksum + _items.Length;
+        }
+
+        private void DisposeCurrentList()
+        {
+            if (_isCreated && _items.IsCreated)
+            {
+                _items.Dispose();
+            }
+
+            _isCreated = false;
         }
 
         private ProjectileData GetDatasetItem(int index)
@@ -408,6 +427,20 @@ namespace Benchmark.Benchmarks
             }
 
             return config.OperationCount;
+        }
+
+        [BurstCompile]
+        private struct UpdateProjectilesJob : IJobParallelFor
+        {
+            public float DeltaTime;
+            public NativeArray<ProjectileData> Items;
+
+            public void Execute(int index)
+            {
+                ProjectileData item = Items[index];
+                item.Update(DeltaTime);
+                Items[index] = item;
+            }
         }
     }
 }
