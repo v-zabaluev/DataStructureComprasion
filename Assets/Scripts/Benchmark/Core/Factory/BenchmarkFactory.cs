@@ -19,6 +19,8 @@ namespace Benchmark.UI
                     return new ArrayProjectileStorageBenchmark();
                 case BenchmarkStructureKind.List:
                     return new ListProjectileStorageBenchmark();
+                case BenchmarkStructureKind.Dictionary:
+                    return new DictionaryProjectileStorageBenchmark();
                 default:
                     throw new NotSupportedException(
                         "Benchmark structure is not supported: " + kind);
