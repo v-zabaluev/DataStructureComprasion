@@ -45,6 +45,8 @@ namespace Benchmark.IO
 
             return
                 "Structure: " + result.Structure + "\n" +
+                "StructureKind: " + config.StructureKind + "\n" +
+                "StructureType: " + GetStructureType(config) + "\n" +
                 "Scenario: " + result.Scenario + "\n" +
                 "Objects: " + result.Objects + "\n" +
                 "Operations: " + result.Operations + "\n" +
@@ -77,7 +79,7 @@ namespace Benchmark.IO
 
         private string CreateFileName(BenchmarkResult result)
         {
-            string name = result.Structure + "_" + result.Scenario + ".csv";
+            string name = result.Scenario + ".csv";
 
             foreach (char invalidChar in Path.GetInvalidFileNameChars())
             {
@@ -91,6 +93,8 @@ namespace Benchmark.IO
         {
             return
                 "Structure;" +
+                "StructureKind;" +
+                "StructureType;" +
                 "Scenario;" +
                 "Objects;" +
                 "Operations;" +
@@ -129,6 +133,8 @@ namespace Benchmark.IO
 
             return
                 Escape(result.Structure) + ";" +
+                Escape(config.StructureKind.ToString()) + ";" +
+                Escape(GetStructureType(config)) + ";" +
                 Escape(result.Scenario) + ";" +
                 result.Objects + ";" +
                 result.Operations + ";" +
@@ -159,6 +165,23 @@ namespace Benchmark.IO
                 result.Checksum + ";" +
                 result.IsSupported + ";" +
                 Escape(result.Message);
+        }
+
+        private string GetStructureType(BenchmarkConfigData config)
+        {
+            string structureKind = config.StructureKind.ToString();
+
+            if (structureKind.StartsWith("Native"))
+            {
+                return "Native";
+            }
+
+            if (structureKind == "Dummy")
+            {
+                return "Utility";
+            }
+
+            return "Managed";
         }
 
         private string Format(double value)
