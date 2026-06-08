@@ -44,7 +44,7 @@ namespace Benchmark.Core
                     i);
 
                 benchmark.Prepare(safeConfig, dataset);
-                _stopwatch.Restart();
+                _stopwatch.Reset();
                 benchmark.RunScenario(safeConfig, _stopwatch);
                 if (_stopwatch.IsRunning)
                 {
@@ -78,7 +78,7 @@ namespace Benchmark.Core
                 long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
                 int gcBefore = GetTotalGCCollections();
 
-                _stopwatch.Restart();
+                _stopwatch.Reset();
                 checksum += benchmark.RunScenario(safeConfig, _stopwatch);
 
                 if (_stopwatch.IsRunning)

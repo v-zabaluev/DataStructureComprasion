@@ -23,7 +23,12 @@ namespace Benchmark.DataStructures
 
         public int RunScenario(BenchmarkConfigData config, Stopwatch stopwatch)
         {
-            return 123;
+            global::Benchmark.Core.BenchmarkTimer.Restart(stopwatch);
+
+            int checksum = 123;
+
+            global::Benchmark.Core.BenchmarkTimer.Stop(stopwatch);
+            return checksum;
         }
 
         public void Cleanup()

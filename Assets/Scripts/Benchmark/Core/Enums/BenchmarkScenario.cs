@@ -12,8 +12,8 @@
         ClearCollection = 7,
         MassFill = 8,
         EffectArea = 9,
-        JobsBurstMassUpdate = 10,
-        FullWaveCycle = 11,
-        ParallelWriteResults = 12
+        FullWaveCycle = 10,
+        BatchIdLookup = 11,
+        JobStructureBuild = 12
     }
 }

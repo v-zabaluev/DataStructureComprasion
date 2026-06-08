@@ -17,8 +17,7 @@ namespace Benchmark.Benchmarks
 
         public bool IsScenarioSupported(BenchmarkScenario scenario)
         {
-            return scenario != BenchmarkScenario.JobsBurstMassUpdate &&
-                   scenario != BenchmarkScenario.ParallelWriteResults;
+            return true;
         }
 
         public void Prepare(BenchmarkConfigData config, ProjectileDataset dataset)
@@ -45,44 +44,71 @@ namespace Benchmark.Benchmarks
 
         public int RunScenario(BenchmarkConfigData config, Stopwatch stopwatch)
         {
+            global::Benchmark.Core.BenchmarkTimer.Restart(stopwatch);
+
+            int checksum;
+
             switch (config.Scenario)
             {
                 case BenchmarkScenario.SequentialIteration:
-                    return RunSequentialIteration();
+                    checksum = RunSequentialIteration();
+                    break;
 
                 case BenchmarkScenario.AddElements:
-                    return RunAddElements(config);
+                    checksum = RunAddElements(config);
+                    break;
 
                 case BenchmarkScenario.RemoveElement:
-                    return RunRemoveElement(config);
+                    checksum = RunRemoveElement(config);
+                    break;
 
                 case BenchmarkScenario.SearchById:
-                    return RunSearchById(config);
+                    checksum = RunSearchById(config);
+                    break;
 
                 case BenchmarkScenario.ContainsElement:
-                    return RunContainsElement(config);
+                    checksum = RunContainsElement(config);
+                    break;
 
                 case BenchmarkScenario.UpdateAll:
-                    return RunUpdateAll(config);
+                    checksum = RunUpdateAll(config);
+                    break;
 
                 case BenchmarkScenario.UpdateOne:
-                    return RunUpdateOne(config);
+                    checksum = RunUpdateOne(config);
+                    break;
 
                 case BenchmarkScenario.ClearCollection:
-                    return RunClearCollection();
+                    checksum = RunClearCollection();
+                    break;
 
                 case BenchmarkScenario.MassFill:
-                    return RunMassFill(config);
+                    checksum = RunMassFill(config);
+                    break;
 
                 case BenchmarkScenario.EffectArea:
-                    return RunEffectArea(config);
+                    checksum = RunEffectArea(config);
+                    break;
 
                 case BenchmarkScenario.FullWaveCycle:
-                    return RunFullWaveCycle(config);
+                    checksum = RunFullWaveCycle(config);
+                    break;
+
+                case BenchmarkScenario.BatchIdLookup:
+                    checksum = RunBatchIdLookup(config);
+                    break;
+
+                case BenchmarkScenario.JobStructureBuild:
+                    checksum = RunJobStructureBuild(config);
+                    break;
 
                 default:
-                    return 0;
+                    checksum = 0;
+                    break;
             }
+
+            global::Benchmark.Core.BenchmarkTimer.Stop(stopwatch);
+            return checksum;
         }
 
         public void Cleanup()
@@ -202,20 +228,18 @@ namespace Benchmark.Benchmarks
         private int RunUpdateAll(BenchmarkConfigData config)
         {
             int checksum = 0;
+            int count = _dataset == null ? 0 : _dataset.Count;
 
-            int[] keys = new int[_items.Count];
-            _items.Keys.CopyTo(keys, 0);
-
-            for (int i = 0; i < keys.Length; i++)
+            for (int id = 0; id < count; id++)
             {
-                int key = keys[i];
-                ProjectileData item = _items[key];
+                if (_items.TryGetValue(id, out ProjectileData item))
+                {
+                    item.Update(config.DeltaTime);
+                    _items[id] = item;
 
-                item.Update(config.DeltaTime);
-                _items[key] = item;
-
-                checksum += Mathf.FloorToInt(item.Position.x);
-                checksum += Mathf.FloorToInt(item.Position.y);
+                    checksum += Mathf.FloorToInt(item.Position.x);
+                    checksum += Mathf.FloorToInt(item.Position.y);
+                }
             }
 
             return checksum;
@@ -308,57 +332,83 @@ namespace Benchmark.Benchmarks
             int checksum = 0;
             int maxActive = Mathf.Max(1, config.WaveCount * config.ProjectilesPerWave);
 
-            Dictionary<int, ProjectileData> active;
+            Dictionary<int, ProjectileData> active = config.PreallocateCapacity
+                ? new Dictionary<int, ProjectileData>(maxActive)
+                : new Dictionary<int, ProjectileData>();
 
-            if (config.PreallocateCapacity)
-            {
-                active = new Dictionary<int, ProjectileData>(maxActive);
-            }
-            else
-            {
-                active = new Dictionary<int, ProjectileData>();
-            }
+            int spawnedCount = 0;
 
             for (int wave = 0; wave < config.WaveCount; wave++)
             {
                 for (int i = 0; i < config.ProjectilesPerWave; i++)
                 {
-                    ProjectileData item = GetDatasetItem(wave * config.ProjectilesPerWave + i);
+                    ProjectileData item = GetDatasetItem(spawnedCount);
                     active[item.Id] = item;
+                    spawnedCount++;
 
                     checksum += item.Id;
                 }
 
-                int[] keysForUpdate = new int[active.Count];
-                active.Keys.CopyTo(keysForUpdate, 0);
-
-                for (int i = 0; i < keysForUpdate.Length; i++)
+                for (int id = 0; id < spawnedCount; id++)
                 {
-                    int key = keysForUpdate[i];
-                    ProjectileData item = active[key];
-
-                    item.Update(config.DeltaTime);
-                    active[key] = item;
-
-                    checksum += Mathf.FloorToInt(item.Position.x + item.Position.y);
-                }
-
-                int[] keysForRemove = new int[active.Count];
-                active.Keys.CopyTo(keysForRemove, 0);
-
-                for (int i = 0; i < keysForRemove.Length; i++)
-                {
-                    int key = keysForRemove[i];
-
-                    if (active.TryGetValue(key, out ProjectileData item) && item.IsExpired())
+                    if (active.TryGetValue(id, out ProjectileData item))
                     {
-                        checksum += item.Id;
-                        active.Remove(key);
+                        item.Update(config.DeltaTime);
+                        checksum += Mathf.FloorToInt(item.Position.x + item.Position.y);
+
+                        if (item.IsExpired())
+                        {
+                            checksum += item.Id;
+                            active.Remove(id);
+                        }
+                        else
+                        {
+                            active[id] = item;
+                        }
                     }
                 }
             }
 
             _items = active;
+
+            return checksum + _items.Count;
+        }
+
+        private int RunBatchIdLookup(BenchmarkConfigData config)
+        {
+            int operations = GetSafeOperationCount(config);
+            int checksum = 0;
+
+            for (int i = 0; i < operations; i++)
+            {
+                int targetId = GetTargetId(i);
+
+                if (_items.ContainsKey(targetId))
+                {
+                    checksum += targetId;
+                }
+            }
+
+            return checksum;
+        }
+
+        private int RunJobStructureBuild(BenchmarkConfigData config)
+        {
+            int operationCount = GetSafeOperationCount(config);
+            int checksum = 0;
+
+            Dictionary<int, ProjectileData> target = config.PreallocateCapacity
+                ? new Dictionary<int, ProjectileData>(operationCount)
+                : new Dictionary<int, ProjectileData>();
+
+            for (int i = 0; i < operationCount; i++)
+            {
+                ProjectileData item = GetDatasetItem(i);
+                target[item.Id] = item;
+                checksum += item.Id;
+            }
+
+            _items = target;
 
             return checksum + _items.Count;
         }

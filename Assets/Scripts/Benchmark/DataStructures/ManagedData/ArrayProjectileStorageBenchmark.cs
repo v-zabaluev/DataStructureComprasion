@@ -17,8 +17,7 @@ namespace Benchmark.Benchmarks
 
         public bool IsScenarioSupported(BenchmarkScenario scenario)
         {
-            return scenario != BenchmarkScenario.JobsBurstMassUpdate &&
-                   scenario != BenchmarkScenario.ParallelWriteResults;
+            return true;
         }
 
         public void Prepare(BenchmarkConfigData config, ProjectileDataset dataset)
@@ -37,44 +36,71 @@ namespace Benchmark.Benchmarks
 
         public int RunScenario(BenchmarkConfigData config, Stopwatch stopwatch)
         {
+            global::Benchmark.Core.BenchmarkTimer.Restart(stopwatch);
+
+            int checksum;
+
             switch (config.Scenario)
             {
                 case BenchmarkScenario.SequentialIteration:
-                    return RunSequentialIteration();
+                    checksum = RunSequentialIteration();
+                    break;
 
                 case BenchmarkScenario.AddElements:
-                    return RunAddElements(config);
+                    checksum = RunAddElements(config);
+                    break;
 
                 case BenchmarkScenario.RemoveElement:
-                    return RunRemoveElement(config);
+                    checksum = RunRemoveElement(config);
+                    break;
 
                 case BenchmarkScenario.SearchById:
-                    return RunSearchById(config);
+                    checksum = RunSearchById(config);
+                    break;
 
                 case BenchmarkScenario.ContainsElement:
-                    return RunContainsElement(config);
+                    checksum = RunContainsElement(config);
+                    break;
 
                 case BenchmarkScenario.UpdateAll:
-                    return RunUpdateAll(config);
+                    checksum = RunUpdateAll(config);
+                    break;
 
                 case BenchmarkScenario.UpdateOne:
-                    return RunUpdateOne(config);
+                    checksum = RunUpdateOne(config);
+                    break;
 
                 case BenchmarkScenario.ClearCollection:
-                    return RunClearCollection();
+                    checksum = RunClearCollection();
+                    break;
 
                 case BenchmarkScenario.MassFill:
-                    return RunMassFill(config);
+                    checksum = RunMassFill(config);
+                    break;
 
                 case BenchmarkScenario.EffectArea:
-                    return RunEffectArea(config);
+                    checksum = RunEffectArea(config);
+                    break;
 
                 case BenchmarkScenario.FullWaveCycle:
-                    return RunFullWaveCycle(config);
+                    checksum = RunFullWaveCycle(config);
+                    break;
+
+                case BenchmarkScenario.BatchIdLookup:
+                    checksum = RunBatchIdLookup(config);
+                    break;
+
+                case BenchmarkScenario.JobStructureBuild:
+                    checksum = RunJobStructureBuild(config);
+                    break;
 
                 default:
-                    return 0;
+                    checksum = 0;
+                    break;
             }
+
+            global::Benchmark.Core.BenchmarkTimer.Stop(stopwatch);
+            return checksum;
         }
 
         public void Cleanup()
@@ -379,6 +405,47 @@ namespace Benchmark.Benchmarks
             _count = activeCount;
 
             return checksum + activeCount;
+        }
+
+        private int RunBatchIdLookup(BenchmarkConfigData config)
+        {
+            int operations = GetSafeOperationCount(config);
+            int checksum = 0;
+
+            for (int i = 0; i < operations; i++)
+            {
+                int targetId = GetTargetId(i);
+
+                for (int j = 0; j < _count; j++)
+                {
+                    if (_items[j].Id == targetId)
+                    {
+                        checksum += targetId;
+                        break;
+                    }
+                }
+            }
+
+            return checksum;
+        }
+
+        private int RunJobStructureBuild(BenchmarkConfigData config)
+        {
+            int operationCount = GetSafeOperationCount(config);
+            ProjectileData[] target = new ProjectileData[operationCount];
+            int checksum = 0;
+
+            for (int i = 0; i < operationCount; i++)
+            {
+                ProjectileData item = GetDatasetItem(i);
+                target[i] = item;
+                checksum += item.Id;
+            }
+
+            _items = target;
+            _count = operationCount;
+
+            return checksum + _count;
         }
 
         private ProjectileData GetDatasetItem(int index)

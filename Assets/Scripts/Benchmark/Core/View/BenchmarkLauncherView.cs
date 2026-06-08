@@ -327,11 +327,13 @@ namespace Benchmark.UI
                 case BenchmarkScenario.AddElements:
                 case BenchmarkScenario.MassFill:
                 case BenchmarkScenario.RemoveElement:
+                case BenchmarkScenario.JobStructureBuild:
                     return config.ObjectCount;
 
                 case BenchmarkScenario.SearchById:
                 case BenchmarkScenario.ContainsElement:
                 case BenchmarkScenario.UpdateOne:
+                case BenchmarkScenario.BatchIdLookup:
                     return config.OperationCount;
 
                 default:
