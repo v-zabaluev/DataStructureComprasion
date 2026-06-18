@@ -31,8 +31,14 @@ namespace Benchmark.UI
                     return new NativeHashSetProjectileStorageBenchmark();
                 case BenchmarkStructureKind.NativeHashMap:
                     return new NativeHashMapProjectileStorageBenchmark();
-                case BenchmarkStructureKind.NativeParallelHashMap:
-                    return new NativeParallelHashMapProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeArrayJob:
+                    return new NativeArrayJobProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeListJob:
+                    return new NativeListJobProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeHashMapJob:
+                    return new NativeHashMapJobProjectileStorageBenchmark();
+                case BenchmarkStructureKind.NativeHashSetJob:
+                    return new NativeHashSetJobProjectileStorageBenchmark();
                 default:
                     throw new NotSupportedException(
                         "Benchmark structure is not supported: " + kind);

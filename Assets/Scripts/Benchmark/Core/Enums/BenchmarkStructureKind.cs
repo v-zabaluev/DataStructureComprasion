@@ -11,7 +11,12 @@
         NativeList = 5,
         NativeHashSet = 6,
         NativeHashMap = 7,
-        NativeParallelHashMap = 8,
-        Dummy = 9,
+
+        NativeArrayJob = 8,
+        NativeListJob = 9,
+        NativeHashMapJob = 10,
+        NativeHashSetJob = 11,
+
+        Dummy = 15,
     }
 }

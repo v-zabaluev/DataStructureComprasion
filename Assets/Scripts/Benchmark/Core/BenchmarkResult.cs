@@ -28,11 +28,6 @@ namespace Benchmark.Core
         public readonly float SpawnMinY;
         public readonly float SpawnMaxX;
         public readonly float SpawnMaxY;
-        public readonly float EffectCenterX;
-        public readonly float EffectCenterY;
-        public readonly float EffectRadius;
-        public readonly int WaveCount;
-        public readonly int ProjectilesPerWave;
 
         public BenchmarkResult(
             string structure,
@@ -75,11 +70,6 @@ namespace Benchmark.Core
             SpawnMinY = Config.SpawnMin.y;
             SpawnMaxX = Config.SpawnMax.x;
             SpawnMaxY = Config.SpawnMax.y;
-            EffectCenterX = Config.EffectCenter.x;
-            EffectCenterY = Config.EffectCenter.y;
-            EffectRadius = Config.EffectRadius;
-            WaveCount = Config.WaveCount;
-            ProjectilesPerWave = Config.ProjectilesPerWave;
         }
     }
 }

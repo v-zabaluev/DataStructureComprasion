@@ -15,12 +15,10 @@ namespace Benchmark.Benchmarks
         private NativeArray<ProjectileData> _items;
         private NativeArray<int> _lookupTargetIds;
         private NativeArray<int> _lookupResults;
-        private NativeArray<ProjectileData> _buildSource;
         private ProjectileDataset _dataset;
         private int _count;
         private bool _isCreated;
         private bool _isLookupDataCreated;
-        private bool _isBuildSourceCreated;
 
         public string StructureName => "NativeArray";
 
@@ -38,6 +36,13 @@ namespace Benchmark.Benchmarks
             int length = dataset == null ? 0 : dataset.Count;
             _count = length;
 
+            if (config.Scenario == BenchmarkScenario.AddElements)
+            {
+                _count = 0;
+
+                return;
+            }
+
             if (length <= 0)
             {
                 return;
@@ -49,16 +54,6 @@ namespace Benchmark.Benchmarks
             for (int i = 0; i < length; i++)
             {
                 _items[i] = GetDatasetItem(i);
-            }
-
-            if (config.Scenario == BenchmarkScenario.BatchIdLookup)
-            {
-                PrepareLookupData(config);
-            }
-
-            if (config.Scenario == BenchmarkScenario.JobStructureBuild)
-            {
-                PrepareBuildSource(config);
             }
         }
 
@@ -72,62 +67,52 @@ namespace Benchmark.Benchmarks
             {
                 case BenchmarkScenario.SequentialIteration:
                     checksum = RunSequentialIteration();
+
                     break;
 
                 case BenchmarkScenario.AddElements:
                     checksum = RunAddElements(config);
+
                     break;
 
                 case BenchmarkScenario.RemoveElement:
                     checksum = RunRemoveElement(config);
+
                     break;
 
                 case BenchmarkScenario.SearchById:
                     checksum = RunSearchById(config);
+
                     break;
 
                 case BenchmarkScenario.ContainsElement:
                     checksum = RunContainsElement(config);
+
                     break;
 
                 case BenchmarkScenario.UpdateAll:
                     checksum = RunUpdateAll(config);
+
                     break;
 
                 case BenchmarkScenario.UpdateOne:
                     checksum = RunUpdateOne(config);
+
                     break;
 
                 case BenchmarkScenario.ClearCollection:
                     checksum = RunClearCollection();
-                    break;
 
-                case BenchmarkScenario.MassFill:
-                    checksum = RunMassFill(config);
-                    break;
-
-                case BenchmarkScenario.EffectArea:
-                    checksum = RunEffectArea(config);
-                    break;
-
-                case BenchmarkScenario.FullWaveCycle:
-                    checksum = RunFullWaveCycle(config);
-                    break;
-
-                case BenchmarkScenario.BatchIdLookup:
-                    checksum = RunBatchIdLookup(config, stopwatch);
-                    break;
-
-                case BenchmarkScenario.JobStructureBuild:
-                    checksum = RunJobStructureBuild(config, stopwatch);
                     break;
 
                 default:
                     checksum = 0;
+
                     break;
             }
 
             global::Benchmark.Core.BenchmarkTimer.Stop(stopwatch);
+
             return checksum;
         }
 
@@ -139,7 +124,6 @@ namespace Benchmark.Benchmarks
             }
 
             DisposeLookupData();
-            DisposeBuildSource();
 
             _dataset = null;
             _count = 0;
@@ -166,8 +150,6 @@ namespace Benchmark.Benchmarks
             int operationCount = GetSafeOperationCount(config);
             int checksum = 0;
 
-            DisposeCurrentArray();
-
             if (config.PreallocateCapacity)
             {
                 _items = new NativeArray<ProjectileData>(operationCount, Allocator.Persistent);
@@ -190,7 +172,9 @@ namespace Benchmark.Benchmarks
             for (int i = 0; i < operationCount; i++)
             {
                 ProjectileData item = GetDatasetItem(i);
-                NativeArray<ProjectileData> expanded = new NativeArray<ProjectileData>(currentLength + 1, Allocator.Persistent);
+
+                NativeArray<ProjectileData> expanded =
+                    new NativeArray<ProjectileData>(currentLength + 1, Allocator.Persistent);
 
                 for (int j = 0; j < currentLength; j++)
                 {
@@ -265,6 +249,7 @@ namespace Benchmark.Benchmarks
                     if (_items[j].Id == targetId)
                     {
                         foundIndex = j;
+
                         break;
                     }
                 }
@@ -290,6 +275,7 @@ namespace Benchmark.Benchmarks
                     if (_items[j].Id == targetId)
                     {
                         contains = true;
+
                         break;
                     }
                 }
@@ -358,183 +344,6 @@ namespace Benchmark.Benchmarks
             return checksum;
         }
 
-        private int RunMassFill(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            DisposeCurrentArray();
-
-            _items = new NativeArray<ProjectileData>(operationCount, Allocator.Persistent);
-            _isCreated = true;
-            _count = operationCount;
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                ProjectileData item = GetDatasetItem(i);
-                _items[i] = item;
-                checksum += item.Id;
-            }
-
-            return checksum + _count;
-        }
-
-        private int RunEffectArea(BenchmarkConfigData config)
-        {
-            int checksum = 0;
-            int insideCount = 0;
-
-            for (int i = 0; i < _count; i++)
-            {
-                ProjectileData item = _items[i];
-
-                if (item.IsInsideCircle(config.EffectCenter, config.EffectRadius))
-                {
-                    insideCount++;
-                    checksum += item.Id;
-                }
-            }
-
-            return checksum + insideCount;
-        }
-
-        private int RunFullWaveCycle(BenchmarkConfigData config)
-        {
-            int checksum = 0;
-            int maxActive = Mathf.Max(1, config.WaveCount * config.ProjectilesPerWave);
-            NativeArray<ProjectileData> active = new NativeArray<ProjectileData>(maxActive, Allocator.Persistent);
-            int activeCount = 0;
-
-            for (int wave = 0; wave < config.WaveCount; wave++)
-            {
-                for (int i = 0; i < config.ProjectilesPerWave; i++)
-                {
-                    if (activeCount >= active.Length)
-                    {
-                        break;
-                    }
-
-                    ProjectileData item = GetDatasetItem(wave * config.ProjectilesPerWave + i);
-                    active[activeCount] = item;
-                    activeCount++;
-                    checksum += item.Id;
-                }
-
-                for (int i = 0; i < activeCount; i++)
-                {
-                    ProjectileData item = active[i];
-                    item.Update(config.DeltaTime);
-                    active[i] = item;
-                    checksum += Mathf.FloorToInt(item.Position.x + item.Position.y);
-                }
-
-                int index = 0;
-
-                while (index < activeCount)
-                {
-                    if (active[index].IsExpired())
-                    {
-                        checksum += active[index].Id;
-
-                        if (config.PreserveOrderOnRemove)
-                        {
-                            for (int j = index; j < activeCount - 1; j++)
-                            {
-                                active[j] = active[j + 1];
-                            }
-
-                            activeCount--;
-                            active[activeCount] = default;
-                        }
-                        else
-                        {
-                            active[index] = active[activeCount - 1];
-                            activeCount--;
-                            active[activeCount] = default;
-                        }
-                    }
-                    else
-                    {
-                        index++;
-                    }
-                }
-            }
-
-            DisposeCurrentArray();
-            _items = active;
-            _isCreated = true;
-            _count = activeCount;
-
-            return checksum + activeCount;
-        }
-
-        private int RunBatchIdLookup(BenchmarkConfigData config, Stopwatch stopwatch)
-        {
-            int operations = GetSafeOperationCount(config);
-
-            if (!_isLookupDataCreated || !_lookupTargetIds.IsCreated || !_lookupResults.IsCreated)
-            {
-                return 0;
-            }
-
-            BatchIdLookupJob job = new BatchIdLookupJob
-            {
-                Count = _count,
-                Items = _items,
-                TargetIds = _lookupTargetIds,
-                Results = _lookupResults
-            };
-
-            JobHandle handle = job.Schedule(operations, 64);
-            handle.Complete();
-
-            if (stopwatch != null && stopwatch.IsRunning)
-            {
-                stopwatch.Stop();
-            }
-
-            int checksum = 0;
-
-            for (int i = 0; i < operations; i++)
-            {
-                checksum += _lookupResults[i];
-            }
-
-            return checksum;
-        }
-
-        private int RunJobStructureBuild(BenchmarkConfigData config, Stopwatch stopwatch)
-        {
-            int operationCount = GetSafeOperationCount(config);
-
-            if (!_isBuildSourceCreated || !_buildSource.IsCreated)
-            {
-                return 0;
-            }
-
-            DisposeCurrentArray();
-
-            _items = new NativeArray<ProjectileData>(operationCount, Allocator.Persistent);
-            _isCreated = true;
-            _count = operationCount;
-
-            FillNativeArrayJob job = new FillNativeArrayJob
-            {
-                Source = _buildSource,
-                Items = _items
-            };
-
-            JobHandle handle = job.Schedule(operationCount, 64);
-            handle.Complete();
-
-            if (stopwatch != null && stopwatch.IsRunning)
-            {
-                stopwatch.Stop();
-            }
-
-            return RunSequentialIteration();
-        }
-
         private void PrepareLookupData(BenchmarkConfigData config)
         {
             DisposeLookupData();
@@ -548,20 +357,6 @@ namespace Benchmark.Benchmarks
             {
                 _lookupTargetIds[i] = GetTargetId(i);
                 _lookupResults[i] = 0;
-            }
-        }
-
-        private void PrepareBuildSource(BenchmarkConfigData config)
-        {
-            DisposeBuildSource();
-
-            int operationCount = GetSafeOperationCount(config);
-            _buildSource = new NativeArray<ProjectileData>(operationCount, Allocator.Persistent);
-            _isBuildSourceCreated = true;
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                _buildSource[i] = GetDatasetItem(i);
             }
         }
 
@@ -581,16 +376,6 @@ namespace Benchmark.Benchmarks
             }
 
             _isLookupDataCreated = false;
-        }
-
-        private void DisposeBuildSource()
-        {
-            if (_isBuildSourceCreated && _buildSource.IsCreated)
-            {
-                _buildSource.Dispose();
-            }
-
-            _isBuildSourceCreated = false;
         }
 
         private void DisposeCurrentArray()
@@ -635,44 +420,6 @@ namespace Benchmark.Benchmarks
             }
 
             return config.OperationCount;
-        }
-
-        [BurstCompile]
-        private struct BatchIdLookupJob : IJobParallelFor
-        {
-            public int Count;
-            [ReadOnly] public NativeArray<ProjectileData> Items;
-            [ReadOnly] public NativeArray<int> TargetIds;
-            public NativeArray<int> Results;
-
-            public void Execute(int index)
-            {
-                int targetId = TargetIds[index];
-                int result = 0;
-
-                for (int i = 0; i < Count; i++)
-                {
-                    if (Items[i].Id == targetId)
-                    {
-                        result = targetId;
-                        break;
-                    }
-                }
-
-                Results[index] = result;
-            }
-        }
-
-        [BurstCompile]
-        private struct FillNativeArrayJob : IJobParallelFor
-        {
-            [ReadOnly] public NativeArray<ProjectileData> Source;
-            public NativeArray<ProjectileData> Items;
-
-            public void Execute(int index)
-            {
-                Items[index] = Source[index];
-            }
         }
     }
 }

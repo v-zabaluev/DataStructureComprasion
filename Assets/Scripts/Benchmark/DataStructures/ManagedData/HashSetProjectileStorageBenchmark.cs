@@ -17,14 +17,10 @@ namespace Benchmark.Benchmarks
         public bool IsScenarioSupported(BenchmarkScenario scenario)
         {
             return
-                scenario == BenchmarkScenario.AddElements ||
                 scenario == BenchmarkScenario.RemoveElement ||
                 scenario == BenchmarkScenario.SearchById ||
                 scenario == BenchmarkScenario.ContainsElement ||
-                scenario == BenchmarkScenario.ClearCollection ||
-                scenario == BenchmarkScenario.MassFill ||
-                scenario == BenchmarkScenario.BatchIdLookup ||
-                scenario == BenchmarkScenario.JobStructureBuild;
+                scenario == BenchmarkScenario.ClearCollection;
         }
 
         public void Prepare(BenchmarkConfigData config, ProjectileDataset dataset)
@@ -56,44 +52,34 @@ namespace Benchmark.Benchmarks
 
             switch (config.Scenario)
             {
-                case BenchmarkScenario.AddElements:
-                    checksum = RunAddElements(config);
-                    break;
-
                 case BenchmarkScenario.RemoveElement:
                     checksum = RunRemoveElement(config);
+
                     break;
 
                 case BenchmarkScenario.SearchById:
                     checksum = RunSearchById(config);
+
                     break;
 
                 case BenchmarkScenario.ContainsElement:
                     checksum = RunContainsElement(config);
+
                     break;
 
                 case BenchmarkScenario.ClearCollection:
                     checksum = RunClearCollection();
-                    break;
 
-                case BenchmarkScenario.MassFill:
-                    checksum = RunMassFill(config);
-                    break;
-
-                case BenchmarkScenario.BatchIdLookup:
-                    checksum = RunBatchIdLookup(config);
-                    break;
-
-                case BenchmarkScenario.JobStructureBuild:
-                    checksum = RunJobStructureBuild(config);
                     break;
 
                 default:
                     checksum = 0;
+
                     break;
             }
 
             global::Benchmark.Core.BenchmarkTimer.Stop(stopwatch);
+
             return checksum;
         }
 
@@ -101,34 +87,6 @@ namespace Benchmark.Benchmarks
         {
             _items = null;
             _dataset = null;
-        }
-
-        private int RunAddElements(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            HashSet<int> target;
-
-            if (config.PreallocateCapacity)
-            {
-                target = new HashSet<int>(operationCount);
-            }
-            else
-            {
-                target = new HashSet<int>();
-            }
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                int id = GetUniqueId(i);
-                target.Add(id);
-                checksum += id;
-            }
-
-            _items = target;
-
-            return checksum + _items.Count;
         }
 
         private int RunRemoveElement(BenchmarkConfigData config)
@@ -200,73 +158,6 @@ namespace Benchmark.Benchmarks
             _items.Clear();
 
             return checksum;
-        }
-
-        private int RunMassFill(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            HashSet<int> target;
-
-            if (config.PreallocateCapacity)
-            {
-                target = new HashSet<int>(operationCount);
-            }
-            else
-            {
-                target = new HashSet<int>();
-            }
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                int id = GetUniqueId(i);
-                target.Add(id);
-                checksum += id;
-            }
-
-            _items = target;
-
-            return checksum + _items.Count;
-        }
-
-        private int RunBatchIdLookup(BenchmarkConfigData config)
-        {
-            int operations = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            for (int i = 0; i < operations; i++)
-            {
-                int id = GetTargetId(i);
-
-                if (_items.Contains(id))
-                {
-                    checksum += id;
-                }
-            }
-
-            return checksum;
-        }
-
-        private int RunJobStructureBuild(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            HashSet<int> target = config.PreallocateCapacity
-                ? new HashSet<int>(operationCount)
-                : new HashSet<int>();
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                int id = GetUniqueId(i);
-                target.Add(id);
-                checksum += id;
-            }
-
-            _items = target;
-
-            return checksum + _items.Count;
         }
 
         private int GetTargetId(int operationIndex)

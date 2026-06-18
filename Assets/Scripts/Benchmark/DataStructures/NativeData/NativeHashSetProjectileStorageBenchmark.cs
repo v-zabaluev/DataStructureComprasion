@@ -23,14 +23,10 @@ namespace Benchmark.Benchmarks
         public bool IsScenarioSupported(BenchmarkScenario scenario)
         {
             return
-                scenario == BenchmarkScenario.AddElements ||
                 scenario == BenchmarkScenario.RemoveElement ||
                 scenario == BenchmarkScenario.SearchById ||
                 scenario == BenchmarkScenario.ContainsElement ||
-                scenario == BenchmarkScenario.ClearCollection ||
-                scenario == BenchmarkScenario.MassFill ||
-                scenario == BenchmarkScenario.BatchIdLookup ||
-                scenario == BenchmarkScenario.JobStructureBuild;
+                scenario == BenchmarkScenario.ClearCollection;
         }
 
         public void Prepare(BenchmarkConfigData config, ProjectileDataset dataset)
@@ -40,7 +36,8 @@ namespace Benchmark.Benchmarks
             _dataset = dataset;
 
             int length = dataset == null ? 0 : dataset.Count;
-            int capacity = config.PreallocateCapacity ? length : 1;
+
+            int capacity = config.PreallocateCapacity ? (length < 1 ? 1 : length) : 1;
 
             _items = new NativeHashSet<int>(capacity, Allocator.Persistent);
             _isCreated = true;
@@ -48,11 +45,6 @@ namespace Benchmark.Benchmarks
             for (int i = 0; i < length; i++)
             {
                 _items.Add(i);
-            }
-
-            if (config.Scenario == BenchmarkScenario.BatchIdLookup)
-            {
-                PrepareLookupData(config);
             }
         }
 
@@ -64,44 +56,34 @@ namespace Benchmark.Benchmarks
 
             switch (config.Scenario)
             {
-                case BenchmarkScenario.AddElements:
-                    checksum = RunAddElements(config);
-                    break;
-
                 case BenchmarkScenario.RemoveElement:
                     checksum = RunRemoveElement(config);
+
                     break;
 
                 case BenchmarkScenario.SearchById:
                     checksum = RunSearchById(config);
+
                     break;
 
                 case BenchmarkScenario.ContainsElement:
                     checksum = RunContainsElement(config);
+
                     break;
 
                 case BenchmarkScenario.ClearCollection:
                     checksum = RunClearCollection();
-                    break;
 
-                case BenchmarkScenario.MassFill:
-                    checksum = RunMassFill(config);
-                    break;
-
-                case BenchmarkScenario.BatchIdLookup:
-                    checksum = RunBatchIdLookup(config, stopwatch);
-                    break;
-
-                case BenchmarkScenario.JobStructureBuild:
-                    checksum = RunJobStructureBuild(config);
                     break;
 
                 default:
                     checksum = 0;
+
                     break;
             }
 
             global::Benchmark.Core.BenchmarkTimer.Stop(stopwatch);
+
             return checksum;
         }
 
@@ -118,35 +100,15 @@ namespace Benchmark.Benchmarks
             _isCreated = false;
         }
 
-        private int RunAddElements(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            DisposeCurrentSet();
-
-            int capacity = config.PreallocateCapacity ? operationCount : 1;
-            _items = new NativeHashSet<int>(capacity, Allocator.Persistent);
-            _isCreated = true;
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                int id = GetUniqueId(i);
-                _items.Add(id);
-                checksum += id;
-            }
-
-            return checksum + _items.Count;
-        }
-
         private int RunRemoveElement(BenchmarkConfigData config)
         {
             int operations = GetSafeOperationCount(config);
             int checksum = 0;
+            int remaining = _items.Count;
 
             for (int i = 0; i < operations; i++)
             {
-                if (_items.Count == 0)
+                if (remaining == 0)
                 {
                     break;
                 }
@@ -156,10 +118,11 @@ namespace Benchmark.Benchmarks
                 if (_items.Remove(id))
                 {
                     checksum += id;
+                    remaining--;
                 }
             }
 
-            return checksum + _items.Count;
+            return checksum + remaining;
         }
 
         private int RunSearchById(BenchmarkConfigData config)
@@ -208,82 +171,6 @@ namespace Benchmark.Benchmarks
             _items.Clear();
 
             return checksum;
-        }
-
-        private int RunMassFill(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            DisposeCurrentSet();
-
-            int capacity = config.PreallocateCapacity ? operationCount : 1;
-            _items = new NativeHashSet<int>(capacity, Allocator.Persistent);
-            _isCreated = true;
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                int id = GetUniqueId(i);
-                _items.Add(id);
-                checksum += id;
-            }
-
-            return checksum + _items.Count;
-        }
-
-        private int RunBatchIdLookup(BenchmarkConfigData config, Stopwatch stopwatch)
-        {
-            int operations = GetSafeOperationCount(config);
-
-            if (!_isLookupDataCreated || !_lookupTargetIds.IsCreated || !_lookupResults.IsCreated)
-            {
-                return 0;
-            }
-
-            BatchIdLookupJob job = new BatchIdLookupJob
-            {
-                Items = _items,
-                TargetIds = _lookupTargetIds,
-                Results = _lookupResults
-            };
-
-            JobHandle handle = job.Schedule(operations, 64);
-            handle.Complete();
-
-            if (stopwatch != null && stopwatch.IsRunning)
-            {
-                stopwatch.Stop();
-            }
-
-            int checksum = 0;
-
-            for (int i = 0; i < operations; i++)
-            {
-                checksum += _lookupResults[i];
-            }
-
-            return checksum;
-        }
-
-        private int RunJobStructureBuild(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            DisposeCurrentSet();
-
-            int capacity = config.PreallocateCapacity ? operationCount : 1;
-            _items = new NativeHashSet<int>(capacity, Allocator.Persistent);
-            _isCreated = true;
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                int id = GetUniqueId(i);
-                _items.Add(id);
-                checksum += id;
-            }
-
-            return checksum + _items.Count;
         }
 
         private void PrepareLookupData(BenchmarkConfigData config)
@@ -353,20 +240,6 @@ namespace Benchmark.Benchmarks
             }
 
             return config.OperationCount;
-        }
-
-        [BurstCompile]
-        private struct BatchIdLookupJob : IJobParallelFor
-        {
-            [ReadOnly] public NativeHashSet<int> Items;
-            [ReadOnly] public NativeArray<int> TargetIds;
-            public NativeArray<int> Results;
-
-            public void Execute(int index)
-            {
-                int id = TargetIds[index];
-                Results[index] = Items.Contains(id) ? id : 0;
-            }
         }
     }
 }

@@ -10,10 +10,5 @@
         UpdateAll = 5,
         UpdateOne = 6,
         ClearCollection = 7,
-        MassFill = 8,
-        EffectArea = 9,
-        FullWaveCycle = 10,
-        BatchIdLookup = 11,
-        JobStructureBuild = 12
     }
 }

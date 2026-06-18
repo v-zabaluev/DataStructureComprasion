@@ -38,159 +38,69 @@ namespace Benchmark.Data
 
             const int accessOperationCount = 10000;
 
-            _configs.Add(CreateConfig(
-                objectCount: 100,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
+            int[] objectCounts =
+            {
+                100,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                25000,
+                50000
+            };
+
+            AddConfigGroup(
+                objectCounts,
+                accessOperationCount,
                 preallocateCapacity: true,
                 preserveOrderOnRemove: false,
-                baseSeed: 101,
-                waveCount: 5,
-                projectilesPerWave: 20,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
+                baseSeedStart: 101);
 
-            _configs.Add(CreateConfig(
-                objectCount: 500,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: true,
+            int[] objectCounts2 =
+            {
+                100,
+                500,
+                1000,
+                2500,
+                5000,
+            };
+
+            AddConfigGroup(
+                objectCounts2,
+                accessOperationCount,
+                preallocateCapacity: false,
                 preserveOrderOnRemove: false,
-                baseSeed: 102,
-                waveCount: 5,
-                projectilesPerWave: 100,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
+                baseSeedStart: 201);
 
-            _configs.Add(CreateConfig(
-                objectCount: 1000,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: true,
-                preserveOrderOnRemove: false,
-                baseSeed: 103,
-                waveCount: 5,
-                projectilesPerWave: 200,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
-
-            _configs.Add(CreateConfig(
-                objectCount: 2500,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: true,
-                preserveOrderOnRemove: false,
-                baseSeed: 104,
-                waveCount: 5,
-                projectilesPerWave: 500,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
-
-            _configs.Add(CreateConfig(
-                objectCount: 5000,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: true,
-                preserveOrderOnRemove: false,
-                baseSeed: 105,
-                waveCount: 5,
-                projectilesPerWave: 1000,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
-
-            _configs.Add(CreateConfig(
-                objectCount: 10000,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: true,
-                preserveOrderOnRemove: false,
-                baseSeed: 106,
-                waveCount: 5,
-                projectilesPerWave: 2000,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
-
-            _configs.Add(CreateConfig(
-                objectCount: 25000,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: true,
-                preserveOrderOnRemove: false,
-                baseSeed: 107,
-                waveCount: 5,
-                projectilesPerWave: 5000,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
-
-            _configs.Add(CreateConfig(
-                objectCount: 50000,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: true,
-                preserveOrderOnRemove: false,
-                baseSeed: 108,
-                waveCount: 5,
-                projectilesPerWave: 10000,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
-
-            _configs.Add(CreateConfig(
-                objectCount: 10000,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
+            AddConfigGroup(
+                objectCounts2,
+                accessOperationCount,
                 preallocateCapacity: true,
                 preserveOrderOnRemove: true,
-                baseSeed: 201,
-                waveCount: 5,
-                projectilesPerWave: 2000,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
+                baseSeedStart: 301);
+        }
 
-            _configs.Add(CreateConfig(
-                objectCount: 2500,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: false,
-                preserveOrderOnRemove: false,
-                baseSeed: 301,
-                waveCount: 5,
-                projectilesPerWave: 500,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
-
-            _configs.Add(CreateConfig(
-                objectCount: 10000,
-                operationCount: accessOperationCount,
-                warmupRuns: 3,
-                measuredRuns: 10,
-                preallocateCapacity: false,
-                preserveOrderOnRemove: false,
-                baseSeed: 302,
-                waveCount: 5,
-                projectilesPerWave: 2000,
-                projectileSpeed: 5f,
-                projectileLifeTime: 5f,
-                effectRadius: 15f));
+        private void AddConfigGroup(
+            int[] objectCounts,
+            int operationCount,
+            bool preallocateCapacity,
+            bool preserveOrderOnRemove,
+            int baseSeedStart)
+        {
+            for (int i = 0; i < objectCounts.Length; i++)
+            {
+                _configs.Add(CreateConfig(
+                    objectCount: objectCounts[i],
+                    operationCount: operationCount,
+                    warmupRuns: 3,
+                    measuredRuns: 10,
+                    preallocateCapacity: preallocateCapacity,
+                    preserveOrderOnRemove: preserveOrderOnRemove,
+                    baseSeed: baseSeedStart + i,
+                    projectileSpeed: 5f,
+                    projectileLifeTime: 5f));
+            }
         }
 
         private BenchmarkConfigData CreateConfig(
@@ -201,11 +111,8 @@ namespace Benchmark.Data
             bool preallocateCapacity,
             bool preserveOrderOnRemove,
             int baseSeed,
-            int waveCount,
-            int projectilesPerWave,
             float projectileSpeed,
-            float projectileLifeTime,
-            float effectRadius)
+            float projectileLifeTime)
         {
             BenchmarkConfigData config = new BenchmarkConfigData();
 
@@ -223,10 +130,6 @@ namespace Benchmark.Data
             config.ProjectileLifeTime = projectileLifeTime;
             config.SpawnMin = new Vector2(0f, 0f);
             config.SpawnMax = new Vector2(100f, 100f);
-            config.EffectCenter = new Vector2(50f, 50f);
-            config.EffectRadius = effectRadius;
-            config.WaveCount = waveCount;
-            config.ProjectilesPerWave = projectilesPerWave;
 
             config.Normalize();
 

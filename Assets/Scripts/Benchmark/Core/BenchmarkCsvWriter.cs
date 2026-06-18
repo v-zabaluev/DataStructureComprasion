@@ -60,10 +60,6 @@ namespace Benchmark.IO
                 "ProjectileLifeTime: " + Format(config.ProjectileLifeTime) + "\n" +
                 "SpawnMin: (" + Format(config.SpawnMin.x) + "; " + Format(config.SpawnMin.y) + ")\n" +
                 "SpawnMax: (" + Format(config.SpawnMax.x) + "; " + Format(config.SpawnMax.y) + ")\n" +
-                "EffectCenter: (" + Format(config.EffectCenter.x) + "; " + Format(config.EffectCenter.y) + ")\n" +
-                "EffectRadius: " + Format(config.EffectRadius) + "\n" +
-                "WaveCount: " + config.WaveCount + "\n" +
-                "ProjectilesPerWave: " + config.ProjectilesPerWave + "\n" +
                 "AverageScenarioExecutionTimeMs: " + Format(result.AverageScenarioExecutionTimeMs) + "\n" +
                 "MedianScenarioExecutionTimeMs: " + Format(result.MedianScenarioExecutionTimeMs) + "\n" +
                 "StandardDeviationScenarioExecutionTimeMs: " + Format(result.StandardDeviationScenarioExecutionTimeMs) + "\n" +
@@ -110,11 +106,6 @@ namespace Benchmark.IO
                 "SpawnMinY;" +
                 "SpawnMaxX;" +
                 "SpawnMaxY;" +
-                "EffectCenterX;" +
-                "EffectCenterY;" +
-                "EffectRadius;" +
-                "WaveCount;" +
-                "ProjectilesPerWave;" +
                 "AverageScenarioExecutionTimeMs;" +
                 "MedianScenarioExecutionTimeMs;" +
                 "StandardDeviationScenarioExecutionTimeMs;" +
@@ -150,11 +141,6 @@ namespace Benchmark.IO
                 Format(config.SpawnMin.y) + ";" +
                 Format(config.SpawnMax.x) + ";" +
                 Format(config.SpawnMax.y) + ";" +
-                Format(config.EffectCenter.x) + ";" +
-                Format(config.EffectCenter.y) + ";" +
-                Format(config.EffectRadius) + ";" +
-                config.WaveCount + ";" +
-                config.ProjectilesPerWave + ";" +
                 Format(result.AverageScenarioExecutionTimeMs) + ";" +
                 Format(result.MedianScenarioExecutionTimeMs) + ";" +
                 Format(result.StandardDeviationScenarioExecutionTimeMs) + ";" +

@@ -54,15 +54,6 @@ namespace Benchmark.UI
         [SerializeField] private TMP_InputField _spawnMaxXInput;
         [SerializeField] private TMP_InputField _spawnMaxYInput;
 
-        [Header("Effect Area")]
-        [SerializeField] private TMP_InputField _effectCenterXInput;
-        [SerializeField] private TMP_InputField _effectCenterYInput;
-        [SerializeField] private TMP_InputField _effectRadiusInput;
-
-        [Header("Wave")]
-        [SerializeField] private TMP_InputField _waveCountInput;
-        [SerializeField] private TMP_InputField _projectilesPerWaveInput;
-
         [Header("Factory")]
         [SerializeField] private BenchmarkFactory _benchmarkFactory;
 
@@ -325,15 +316,12 @@ namespace Benchmark.UI
             switch (scenario)
             {
                 case BenchmarkScenario.AddElements:
-                case BenchmarkScenario.MassFill:
                 case BenchmarkScenario.RemoveElement:
-                case BenchmarkScenario.JobStructureBuild:
                     return config.ObjectCount;
 
                 case BenchmarkScenario.SearchById:
                 case BenchmarkScenario.ContainsElement:
                 case BenchmarkScenario.UpdateOne:
-                case BenchmarkScenario.BatchIdLookup:
                     return config.OperationCount;
 
                 default:
@@ -407,15 +395,6 @@ namespace Benchmark.UI
             config.SpawnMax = new Vector2(
                 ReadFloat(_spawnMaxXInput, 100f),
                 ReadFloat(_spawnMaxYInput, 100f));
-
-            config.EffectCenter = new Vector2(
-                ReadFloat(_effectCenterXInput, 50f),
-                ReadFloat(_effectCenterYInput, 50f));
-
-            config.EffectRadius = ReadFloat(_effectRadiusInput, 15f);
-
-            config.WaveCount = ReadInt(_waveCountInput, 5);
-            config.ProjectilesPerWave = ReadInt(_projectilesPerWaveInput, 1000);
 
             config.Normalize();
 

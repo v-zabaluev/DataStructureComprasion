@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Benchmark.Core;
 using Benchmark.Core.Enums;
 using Benchmark.Core.Interfaces;
 using Benchmark.Data;
@@ -36,7 +37,7 @@ namespace Benchmark.Benchmarks
 
         public int RunScenario(BenchmarkConfigData config, Stopwatch stopwatch)
         {
-            global::Benchmark.Core.BenchmarkTimer.Restart(stopwatch);
+            BenchmarkTimer.Restart(stopwatch);
 
             int checksum;
 
@@ -44,62 +45,52 @@ namespace Benchmark.Benchmarks
             {
                 case BenchmarkScenario.SequentialIteration:
                     checksum = RunSequentialIteration();
+
                     break;
 
                 case BenchmarkScenario.AddElements:
                     checksum = RunAddElements(config);
+
                     break;
 
                 case BenchmarkScenario.RemoveElement:
                     checksum = RunRemoveElement(config);
+
                     break;
 
                 case BenchmarkScenario.SearchById:
                     checksum = RunSearchById(config);
+
                     break;
 
                 case BenchmarkScenario.ContainsElement:
                     checksum = RunContainsElement(config);
+
                     break;
 
                 case BenchmarkScenario.UpdateAll:
                     checksum = RunUpdateAll(config);
+
                     break;
 
                 case BenchmarkScenario.UpdateOne:
                     checksum = RunUpdateOne(config);
+
                     break;
 
                 case BenchmarkScenario.ClearCollection:
                     checksum = RunClearCollection();
-                    break;
 
-                case BenchmarkScenario.MassFill:
-                    checksum = RunMassFill(config);
-                    break;
-
-                case BenchmarkScenario.EffectArea:
-                    checksum = RunEffectArea(config);
-                    break;
-
-                case BenchmarkScenario.FullWaveCycle:
-                    checksum = RunFullWaveCycle(config);
-                    break;
-
-                case BenchmarkScenario.BatchIdLookup:
-                    checksum = RunBatchIdLookup(config);
-                    break;
-
-                case BenchmarkScenario.JobStructureBuild:
-                    checksum = RunJobStructureBuild(config);
                     break;
 
                 default:
                     checksum = 0;
+
                     break;
             }
 
-            global::Benchmark.Core.BenchmarkTimer.Stop(stopwatch);
+            BenchmarkTimer.Stop(stopwatch);
+
             return checksum;
         }
 
@@ -314,138 +305,6 @@ namespace Benchmark.Benchmarks
             _count = 0;
 
             return checksum;
-        }
-
-        private int RunMassFill(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            ProjectileData[] target = new ProjectileData[operationCount];
-            int checksum = 0;
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                ProjectileData item = GetDatasetItem(i);
-                target[i] = item;
-                checksum += item.Id;
-            }
-
-            _items = target;
-            _count = operationCount;
-
-            return checksum + _count;
-        }
-
-        private int RunEffectArea(BenchmarkConfigData config)
-        {
-            int checksum = 0;
-            int insideCount = 0;
-
-            for (int i = 0; i < _count; i++)
-            {
-                ProjectileData item = _items[i];
-
-                if (item.IsInsideCircle(config.EffectCenter, config.EffectRadius))
-                {
-                    insideCount++;
-                    checksum += item.Id;
-                }
-            }
-
-            return checksum + insideCount;
-        }
-
-        private int RunFullWaveCycle(BenchmarkConfigData config)
-        {
-            int checksum = 0;
-            int maxActive = Mathf.Max(1, config.WaveCount * config.ProjectilesPerWave);
-            ProjectileData[] active = new ProjectileData[maxActive];
-            int activeCount = 0;
-
-            for (int wave = 0; wave < config.WaveCount; wave++)
-            {
-                for (int i = 0; i < config.ProjectilesPerWave; i++)
-                {
-                    if (activeCount >= active.Length)
-                    {
-                        break;
-                    }
-
-                    ProjectileData item = GetDatasetItem(wave * config.ProjectilesPerWave + i);
-                    active[activeCount] = item;
-                    activeCount++;
-                    checksum += item.Id;
-                }
-
-                for (int i = 0; i < activeCount; i++)
-                {
-                    ProjectileData item = active[i];
-                    item.Update(config.DeltaTime);
-                    active[i] = item;
-                    checksum += Mathf.FloorToInt(item.Position.x + item.Position.y);
-                }
-
-                int index = 0;
-
-                while (index < activeCount)
-                {
-                    if (active[index].IsExpired())
-                    {
-                        checksum += active[index].Id;
-                        active[index] = active[activeCount - 1];
-                        activeCount--;
-                    }
-                    else
-                    {
-                        index++;
-                    }
-                }
-            }
-
-            _items = active;
-            _count = activeCount;
-
-            return checksum + activeCount;
-        }
-
-        private int RunBatchIdLookup(BenchmarkConfigData config)
-        {
-            int operations = GetSafeOperationCount(config);
-            int checksum = 0;
-
-            for (int i = 0; i < operations; i++)
-            {
-                int targetId = GetTargetId(i);
-
-                for (int j = 0; j < _count; j++)
-                {
-                    if (_items[j].Id == targetId)
-                    {
-                        checksum += targetId;
-                        break;
-                    }
-                }
-            }
-
-            return checksum;
-        }
-
-        private int RunJobStructureBuild(BenchmarkConfigData config)
-        {
-            int operationCount = GetSafeOperationCount(config);
-            ProjectileData[] target = new ProjectileData[operationCount];
-            int checksum = 0;
-
-            for (int i = 0; i < operationCount; i++)
-            {
-                ProjectileData item = GetDatasetItem(i);
-                target[i] = item;
-                checksum += item.Id;
-            }
-
-            _items = target;
-            _count = operationCount;
-
-            return checksum + _count;
         }
 
         private ProjectileData GetDatasetItem(int index)

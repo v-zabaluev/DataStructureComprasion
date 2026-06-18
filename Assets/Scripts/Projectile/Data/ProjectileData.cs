@@ -24,18 +24,5 @@ namespace Projectile.Data
             Position += Direction * Speed * deltaTime;
             LifeTime -= deltaTime;
         }
-
-        public bool IsExpired()
-        {
-            return LifeTime <= 0f;
-        }
-
-        public bool IsInsideCircle(Vector2 center, float radius)
-        {
-            float sqrRadius = radius * radius;
-            float sqrDistance = (Position - center).sqrMagnitude;
-
-            return sqrDistance <= sqrRadius;
-        }
     }
-}
+}   

@@ -1,0 +1,267 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f2768f535e24803804ce024c79ebd18, type: 3}
+  m_Name: RecommendedBenchmarkBatchConfigSet 2
+  m_EditorClassIdentifier: Assembly-CSharp::Benchmark.Data.BenchmarkBatchConfigSet
+  _configs:
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 100
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 101
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 500
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 102
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 1000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 103
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 2500
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 104
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 5000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 105
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 10000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 106
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 25000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 107
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 50000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 0
+    BaseSeed: 108
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 100
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 0
+    PreserveOrderOnRemove: 0
+    BaseSeed: 201
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 500
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 0
+    PreserveOrderOnRemove: 0
+    BaseSeed: 202
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 1000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 0
+    PreserveOrderOnRemove: 0
+    BaseSeed: 203
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 2500
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 0
+    PreserveOrderOnRemove: 0
+    BaseSeed: 204
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 5000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 0
+    PreserveOrderOnRemove: 0
+    BaseSeed: 205
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 100
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 1
+    BaseSeed: 301
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 500
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 1
+    BaseSeed: 302
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 1000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 1
+    BaseSeed: 303
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 2500
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 1
+    BaseSeed: 304
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}
+  - StructureKind: 0
+    Scenario: 0
+    ObjectCount: 5000
+    OperationCount: 10000
+    WarmupRuns: 3
+    MeasuredRuns: 10
+    PreallocateCapacity: 1
+    PreserveOrderOnRemove: 1
+    BaseSeed: 305
+    DeltaTime: 0.016
+    ProjectileSpeed: 5
+    ProjectileLifeTime: 5
+    SpawnMin: {x: 0, y: 0}
+    SpawnMax: {x: 100, y: 100}

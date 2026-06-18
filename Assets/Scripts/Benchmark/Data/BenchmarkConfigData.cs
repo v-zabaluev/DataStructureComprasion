@@ -44,18 +44,6 @@ namespace Benchmark.Data
 
         public Vector2 SpawnMax = new Vector2(100f, 100f);
 
-        [Header("Effect Area")]
-
-        public Vector2 EffectCenter = new Vector2(50f, 50f);
-
-        public float EffectRadius = 15f;
-
-        [Header("Wave")]
-
-        [Min(1)] public int WaveCount = 5;
-
-        [Min(1)] public int ProjectilesPerWave = 1000;
-
         public BenchmarkConfigData Clone()
         {
             BenchmarkConfigData clone = new BenchmarkConfigData
@@ -73,11 +61,7 @@ namespace Benchmark.Data
                 ProjectileSpeed = ProjectileSpeed,
                 ProjectileLifeTime = ProjectileLifeTime,
                 SpawnMin = SpawnMin,
-                SpawnMax = SpawnMax,
-                EffectCenter = EffectCenter,
-                EffectRadius = EffectRadius,
-                WaveCount = WaveCount,
-                ProjectilesPerWave = ProjectilesPerWave
+                SpawnMax = SpawnMax
             };
 
             clone.Normalize();
@@ -107,16 +91,6 @@ namespace Benchmark.Data
                 MeasuredRuns = 1;
             }
 
-            if (WaveCount < 1)
-            {
-                WaveCount = 1;
-            }
-
-            if (ProjectilesPerWave < 1)
-            {
-                ProjectilesPerWave = 1;
-            }
-
             if (SpawnMax.x < SpawnMin.x)
             {
                 float temp = SpawnMin.x;
@@ -129,11 +103,6 @@ namespace Benchmark.Data
                 float temp = SpawnMin.y;
                 SpawnMin.y = SpawnMax.y;
                 SpawnMax.y = temp;
-            }
-
-            if (EffectRadius < 0f)
-            {
-                EffectRadius = 0f;
             }
         }
     }
